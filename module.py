@@ -28,12 +28,29 @@ LIGHT_RED = (2, 53, 255)
 # face detector object
 detectFace = dlib.get_frontal_face_detector()
 
-
 # landmarks detector
 predictor = dlib.shape_predictor("Predictor/shape_predictor_68_face_landmarks.dat")
 
 
 #functions
+
+def midpoint(pts1, pts2):
+    x, y = pts1
+    x1, y1 = pts2
+    xOut = int((x + x1)/2)
+    yOut = int((y1 + y)/2)
+    # print(xOut, x, x1)
+    return (xOut, yOut)
+
+
+def eucaldainDistance(pts1, pts2):
+    x, y = pts1
+    x1, y1 = pts2
+    eucaldainDist = math.sqrt((x1 - x) ** 2 + (y1 - y) ** 2)
+
+    return eucaldainDist
+
+
 def faceDetector(image, gray, Draw=True):
     cordFace1 = (0, 0)
     cordFace2 = (0, 0)
@@ -72,4 +89,22 @@ def faceLandmakDetector(image, gray, face, Draw=True):
                 # draw circle on each landmark
                 cv.circle(image, point, 3, ORANGE, 1)
     return image, pointList
+
+
+
+# Blink detector function.
+def blinkDetector(eyePoints):
+    top = eyePoints[1:3]
+    bottom = eyePoints[4:6]
+    # print(top, bottom)
+    # finding the mid point of above points
+    topMid = midpoint(top[0], top[1])
+    bottomMid = midpoint(bottom[0], bottom[1])
+    # getting the actual width and height eyes using eucaldainDistance function
+    VerticalDistance = eucaldainDistance(topMid, bottomMid)
+    HorizontalDistance = eucaldainDistance(eyePoints[0], eyePoints[3])
+    # print()
+
+    blinkRatio = (HorizontalDistance/VerticalDistance)
+    return blinkRatio, topMid, bottomMid
 
